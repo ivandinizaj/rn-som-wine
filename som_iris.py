@@ -46,7 +46,7 @@ def most_common(lst, n):
 def main():
   # 0. get started
   np.random.seed(1)
-  Dim = 4
+  Dim = 14
   Rows = 5; Cols = 9
   RangeMax = Rows + Cols
   LearnMax = 0.5
@@ -54,14 +54,16 @@ def main():
 
   # 1. load data
   print("\nLoading Iris data into memory \n")
-  data_file = "iris_data_012.txt"
-  data_x = np.loadtxt(data_file, delimiter=",", usecols=range(0,4),
+  data_file = "wine.data.txt"
+  data_x = np.loadtxt(data_file, delimiter=",", usecols=range(0,Dim),
     dtype=np.float64)
-  data_y = np.loadtxt(data_file, delimiter=",", usecols=[4],
+  data_y = np.loadtxt(data_file, delimiter=",", usecols=[Dim-1],
     dtype=np.int)
   # option: normalize data  
 
-  print( euc_dist(data_x[0], data_x[2]) )
+  # print( euc_dist(data_x[0], data_x[2]) )
+
+  print(data_x[0][Dim-1])
 
   # 2. construct the SOM
   # print(f'Constructing a {Rows}x{} SOM from the iris data')
@@ -89,7 +91,7 @@ def main():
           map[i][j] = map[i][j] + curr_rate * \
 (data_x[t] - map[i][j])
 
-  show_matrix(Rows, Cols, data_x, data_y, map)
+  show_matrix(Rows, Cols, data_x, data_y, map, Dim)
 
   print("SOM construction complete \n")
 
@@ -119,8 +121,8 @@ def main():
 
   # 4. because the data has labels, another possible visualization:
   # associate each data label with a map node
-def show_matrix(Rows, Cols, data_x, data_y, map):
-  print("Associating each data label to one map node ")
+def show_matrix(Rows, Cols, data_x, data_y, map, Dim):
+  print("Associando cada rotulo de dados a um no do mapa")
   mapping = np.empty(shape=(Rows,Cols), dtype=object)
   for i in range(Rows):
     for j in range(Cols):
@@ -133,11 +135,11 @@ def show_matrix(Rows, Cols, data_x, data_y, map):
   label_map = np.zeros(shape=(Rows,Cols), dtype=np.int)
   for i in range(Rows):
     for j in range(Cols):
-      label_map[i][j] = most_common(mapping[i][j], 3)
- 
-  plt.imshow(label_map, cmap=plt.cm.get_cmap('terrain_r', 4))
+      label_map[i][j] = most_common(mapping[i][j], 4)
+
+  # quantidade de cores no mapa
+  plt.imshow(label_map, cmap=plt.cm.get_cmap('terrain_r', 3))
   plt.colorbar()
-  # plt.savefig("image/image.jpg")
   plt.show()
   
 
