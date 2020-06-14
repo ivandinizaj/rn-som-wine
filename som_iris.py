@@ -6,6 +6,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 # note: if this fails, try >pip uninstall matplotlib
 # and then >pip install matplotlib
 
@@ -49,8 +50,13 @@ def main():
   Dim = 14
   Rows = 5; Cols = 9
   RangeMax = Rows + Cols
-  LearnMax = 0.5
+  radius0 = max(Rows,Cols)/2
+  radius=radius0
+  LearnMax = 0.1
   StepsMax = 5000
+  learning_rate = LearnMax
+  # print(radius0)
+  # print(RangeMax)
 
   # 1. load data
   print("\nLoading Iris data into memory \n")
@@ -63,35 +69,43 @@ def main():
 
   # print( euc_dist(data_x[0], data_x[2]) )
 
-  print(data_x[0][Dim-1])
+  # print(data_x[0][Dim-1])
 
   # 2. construct the SOM
   # print(f'Constructing a {Rows}x{} SOM from the iris data')
   map = np.random.random_sample(size=(Rows,Cols,Dim))
-  for s in range(StepsMax):
+  for epoch in range(StepsMax):
+    # print(()
+
     # if s % (StepsMax/20) == 0: 
       # print("step = ", str(s))
       # show_matrix(Rows, Cols, data_x, data_y, map)
 
-    pct_left = 1.0 - ((s * 1.0) / StepsMax)
-    curr_range = (int)(pct_left * RangeMax)
-    curr_rate = pct_left * LearnMax
+    # pct_left = 1.0 - ((epoch * 1.0) / StepsMax)
+    # curr_range = (int)(pct_left * RangeMax)
+    # curr_rate = pct_left * LearnMax
 
     # print(curr_rate)
 
     t = np.random.randint(len(data_x))
     # print(t)
 
+
+
     # encontrei o vinho mais proximo do T
     (bmu_row, bmu_col) = closest_node(data_x, t, map, Rows, Cols)
     for i in range(Rows):
       for j in range(Cols):
-        if manhattan_dist(bmu_row, bmu_col, i, j) < curr_range:
-          # 
-          map[i][j] = map[i][j] + curr_rate * \
-(data_x[t] - map[i][j])
+        # if euc_dist(map[bmu_row][bmu_col],map[i][j]) <= radius:
+        if manhattan_dist(bmu_row, bmu_col, i, j) < radius:
+          map[i][j] = (map[i][j] + learning_rate * (data_x[t] - map[i][j]))
 
-  show_matrix(Rows, Cols, data_x, data_y, map, Dim)
+    # learning_rate = LearnMax*(1-(float(epoch)/StepsMax))
+    learning_rate = LearnMax*math.exp(-float(epoch)/StepsMax)
+    # print(radius)
+    radius = RangeMax*math.exp(-float(epoch)/StepsMax)
+
+  show_matrix(Rows, Cols, data_x, data_y, map)
 
   print("SOM construction complete \n")
 
@@ -121,7 +135,7 @@ def main():
 
   # 4. because the data has labels, another possible visualization:
   # associate each data label with a map node
-def show_matrix(Rows, Cols, data_x, data_y, map, Dim):
+def show_matrix(Rows, Cols, data_x, data_y, map):
   print("Associando cada rotulo de dados a um no do mapa")
   mapping = np.empty(shape=(Rows,Cols), dtype=object)
   for i in range(Rows):
@@ -138,7 +152,7 @@ def show_matrix(Rows, Cols, data_x, data_y, map, Dim):
       label_map[i][j] = most_common(mapping[i][j], 4)
 
   # quantidade de cores no mapa
-  plt.imshow(label_map, cmap=plt.cm.get_cmap('terrain_r', 3))
+  plt.imshow(label_map, cmap=plt.cm.get_cmap('terrain_r', 4))
   plt.colorbar()
   plt.show()
   
